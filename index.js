@@ -97,49 +97,15 @@ async function run() {
        res.send(result);
   });
 //  get all data
-  // app.get('/alldata', async (req, res) => {
-  //   console.log(req.query)
-  //    if(req.query.sort === "asc"){
-  //     const page = parseInt(req.query.page) || 0;
-  //     const limit = parseInt(req.query.limit) || 5;
-  //     const skip = page*limit;
-  //     const result = await  adddatacollection.find().skip(skip).limit(limit).sort(-1).toArray();
-  //     res.send(result);
-  //    }
-  //    else if(req.query.sort === "desc" ){
-  //     const page = parseInt(req.query.page) || 0;
-  //     const limit = parseInt(req.query.limit) || 5;
-  //     const skip = page*limit;
-  //     const result = await  adddatacollection.find().skip(skip).limit(limit).sort(1).toArray();
-  //     res.send(result);
-  //    }
-   
-  // });
-
   app.get('/alldata', async (req, res) => {
-    console.log(req.query);
-    if (req.query.sortdb === "asc") {
+    console.log(req.query)
       const page = parseInt(req.query.page) || 0;
       const limit = parseInt(req.query.limit) || 5;
-      const skip = page * limit;
-      const result = await adddatacollection.find().skip(skip).limit(limit).sort(1).toArray();
+      const skip = page*limit;
+      const result = await  adddatacollection.find().skip(skip).limit(limit).toArray();
       res.send(result);
-    } else if (req.query.sortdb === "desc") {
-      const page = parseInt(req.query.page) || 0;
-      const limit = parseInt(req.query.limit) || 5;
-      const skip = page * limit;
-      const result = await adddatacollection.find().skip(skip).limit(limit).sort(-1).toArray();
-      res.send(result);
-    }
-    else{
-      const page = parseInt(req.query.page) || 0;
-      const limit = parseInt(req.query.limit) || 5;
-      const skip = page * limit;
-      const result = await adddatacollection.find().skip(skip).limit(limit).toArray();
-      res.send(result);
-    }
+   
   });
-  
   // for pagination
 
   app.get('/totalpage', async (req, res) => {
