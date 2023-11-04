@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 var cors = require('cors')
+var jwt = require('jsonwebtoken');
 require('dotenv').config()
 const port =process.env.PORT ||  5000
 
@@ -31,6 +32,35 @@ const client = new MongoClient(uri, {
   }
 });
 
+
+
+
+
+const verifyJWT = (req,res,next) =>{
+  console.log('hitting verify JWT')
+  console.log("athor",req.headers.athorization);
+  const athorization = req.headers.athorization;
+  if(!athorization){
+   return res.status(401).send({error:true, messege:'unathorized access'})
+  }
+ 
+  const token = athorization.split(' ')[1];
+  console.log('token inside verify JWT//',token)
+  jwt.verify(token,process.env.AC_TOKEN_SECRETE, (error,decoded) =>{
+      if(error){
+       return res.status(403).send({error:true, messege:'unathorized access'})
+      }
+      req.decoded=decoded;
+      next()
+  })
+ }
+
+
+
+
+
+
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -41,6 +71,24 @@ async function run() {
  
   const adddatacollection = client.db("redgreentask").collection("alldata");
 
+
+    //JWT
+    app.post('/jwt',(req,res)=>{
+    
+      const user = req.body;
+      // console.log("ss",user)
+      var token = jwt.sign(user,process.env.AC_TOKEN_SECRETE,{expiresIn: '2h' })
+      console.log(token)
+      res.send({token})
+    })
+      //JWT
+
+
+
+
+
+
+
 // ----------------Add data
     app.post('/adddata', async(req,res)=>{
       const newItem = req.body;
@@ -49,10 +97,57 @@ async function run() {
        res.send(result);
   });
 //  get all data
+  // app.get('/alldata', async (req, res) => {
+  //   console.log(req.query)
+  //    if(req.query.sort === "asc"){
+  //     const page = parseInt(req.query.page) || 0;
+  //     const limit = parseInt(req.query.limit) || 5;
+  //     const skip = page*limit;
+  //     const result = await  adddatacollection.find().skip(skip).limit(limit).sort(-1).toArray();
+  //     res.send(result);
+  //    }
+  //    else if(req.query.sort === "desc" ){
+  //     const page = parseInt(req.query.page) || 0;
+  //     const limit = parseInt(req.query.limit) || 5;
+  //     const skip = page*limit;
+  //     const result = await  adddatacollection.find().skip(skip).limit(limit).sort(1).toArray();
+  //     res.send(result);
+  //    }
+   
+  // });
+
   app.get('/alldata', async (req, res) => {
-    const result = await adddatacollection.find().toArray();
-    res.send(result);
+    console.log(req.query);
+    if (req.query.sortdb === "asc") {
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 5;
+      const skip = page * limit;
+      const result = await adddatacollection.find().skip(skip).limit(limit).sort(1).toArray();
+      res.send(result);
+    } else if (req.query.sortdb === "desc") {
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 5;
+      const skip = page * limit;
+      const result = await adddatacollection.find().skip(skip).limit(limit).sort(-1).toArray();
+      res.send(result);
+    }
+    else{
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 5;
+      const skip = page * limit;
+      const result = await adddatacollection.find().skip(skip).limit(limit).toArray();
+      res.send(result);
+    }
   });
+  
+  // for pagination
+
+  app.get('/totalpage', async (req, res) => {
+    const result = await adddatacollection.estimatedDocumentCount();
+    res.send({totaldatapage: result});
+  });
+
+  // =========================
 
   // get single data
   app.get('/alldata/:id', async(req, res) => {
