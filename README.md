@@ -1,0 +1,7 @@
+- At frist I install Express,cors,Mongodb,dotenv,jsonwebtoken
+- then i create index.js , .gitigonre and .env file
+- then write a code for express and the connect Mongodb
+- then Mongodbs userName and password moved to .env file
+- After that work i will go to .gitignore file and ignore node_modules and  .env
+- then i whould like to do code for adding , reading ,update , delete,sorting and pagination in index.js file
+- then i write code for jwt token and its secrete token put in .env file

@@ -35,7 +35,7 @@ const client = new MongoClient(uri, {
 
 
 
-
+//  verifyJWT
 const verifyJWT = (req,res,next) =>{
   console.log('hitting verify JWT')
   console.log("athor",req.headers.athorization);
@@ -54,6 +54,7 @@ const verifyJWT = (req,res,next) =>{
       next()
   })
  }
+//  ===============
 
 
 
@@ -83,12 +84,6 @@ async function run() {
     })
       //JWT
 
-
-
-
-
-
-
 // ----------------Add data
     app.post('/adddata', async(req,res)=>{
       const newItem = req.body;
@@ -97,14 +92,21 @@ async function run() {
        res.send(result);
   });
 //  get all data
-  app.get('/alldata', async (req, res) => {
-    console.log(req.query)
-      const page = parseInt(req.query.page) || 0;
-      const limit = parseInt(req.query.limit) || 5;
-      const skip = page*limit;
-      const result = await  adddatacollection.find().skip(skip).limit(limit).toArray();
-      res.send(result);
-   
+  app.get('/alldata',async (req, res) => {
+    const { sort } = req.query;
+    console.log({query:req.query})
+    let sortQuery = {};
+    if (sort === 'asc') {
+      sortQuery = { name: 1 };
+    } else if (sort === 'desc') {
+      sortQuery = { name: -1 };
+    }
+    const limit = parseInt(req.query.limit) || 10
+    const page = parseInt(req.query.page) || 1
+    const skip = (page - 1) * limit
+
+    const result = await adddatacollection.find({}).sort(sortQuery).limit(limit).skip(skip).toArray();
+      res.send(result)
   });
   // for pagination
 
@@ -151,6 +153,7 @@ async function run() {
       const result = await adddatacollection.updateOne(filter, update, options);
       res.send(result)
  })
+//  update data end=============
 
 
 
