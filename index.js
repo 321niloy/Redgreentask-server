@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-var cors = require('cors')
+const cors = require('cors');
 var jwt = require('jsonwebtoken');
 require('dotenv').config()
 const port =process.env.PORT ||  5000
@@ -36,24 +36,26 @@ const client = new MongoClient(uri, {
 
 
 //  verifyJWT
-const verifyJWT = (req,res,next) =>{
-  console.log('hitting verify JWT')
-  console.log("athor",req.headers.athorization);
-  const athorization = req.headers.athorization;
-  if(!athorization){
-   return res.status(401).send({error:true, messege:'unathorized access'})
+// verifyJWT
+const verifyJWT = (req, res, next) => {
+  console.log('hitting verify JWT');
+  console.log("authorization", req.headers.authorization); // Use "authorization" with a capital 'A'
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({ error: true, message: 'unauthorized access' });
   }
- 
-  const token = athorization.split(' ')[1];
-  console.log('token inside verify JWT//',token)
-  jwt.verify(token,process.env.AC_TOKEN_SECRETE, (error,decoded) =>{
-      if(error){
-       return res.status(403).send({error:true, messege:'unathorized access'})
-      }
-      req.decoded=decoded;
-      next()
-  })
- }
+
+  const token = authorization.split(' ')[1];
+  console.log('token inside verify JWT:', token);
+  jwt.verify(token, process.env.AC_TOKEN_SECRET, (error, decoded) => {
+    if (error) {
+      return res.status(403).send({ error: true, message: 'unauthorized access' });
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
+
 //  ===============
 
 
@@ -65,7 +67,7 @@ const verifyJWT = (req,res,next) =>{
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
 
 
@@ -174,7 +176,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('Hello World, I am from Bangladesh!')
 })
 
 app.listen(port, () => {
